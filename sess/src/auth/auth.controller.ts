@@ -8,11 +8,14 @@ import {
 import { AuthLoginDto } from './dto/auth-login.dto';
 import { AuthenticatedGuard, LocalAuthGuard } from './Guards';
 import { Request, Response } from 'express';
+import { UserService } from 'src/user/user.service';
 
 @ApiTags('auth')
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(
+    private readonly authService: AuthService,
+    private readonly userService: UserService,) {}
 
   @UseGuards(LocalAuthGuard)
   @Post('login')
@@ -23,6 +26,7 @@ export class AuthController {
   async login(
     @Body() req: AuthLoginDto
   ): Promise<any> {
+    return this.userService.searchUserByEmail(req.email);
   }
 
   @UseGuards(AuthenticatedGuard)

@@ -22,13 +22,14 @@ async function bootstrap() {
     saveUninitialized:false,
     cookie:{
       maxAge:86400000,
+      sameSite:false,
     },
     store: new TypeormStore({repository})
   }));
 
   app.use(passport.initialize());
   app.use(passport.session());
-
+  app.enableCors();
   const config = new DocumentBuilder()
     .setTitle('Chat API')
     .setDescription('description')
@@ -38,7 +39,7 @@ async function bootstrap() {
     const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, document);
     
-  await app.listen(3000);
+  await app.listen(5000);
 
   
 }

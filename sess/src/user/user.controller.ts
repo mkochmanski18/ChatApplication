@@ -13,7 +13,7 @@ import {
   } from '@nestjs/swagger';
 import { AuthenticatedGuard } from 'src/auth/Guards';
 import { pwdChangeDto } from './dto/pwdChange.dto';
-import { RolesGuard } from 'src/auth/roles.guard';
+import { RolesGuard } from 'src/auth/Guards';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 

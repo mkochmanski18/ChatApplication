@@ -7,10 +7,12 @@ import { User } from 'src/user/user.entity';
 import { PassportModule } from '@nestjs/passport';
 import { LocalStrategy } from './localStrategy';
 import { SessionSerializer } from './sessionSerializer';
+import { UserModule } from 'src/user/user.module';
 
 @Module({
   imports:[
-    TypeOrmModule.forFeature([User])
+    TypeOrmModule.forFeature([User]),
+    UserModule
   ],
   controllers: [AuthController],
   providers: [
