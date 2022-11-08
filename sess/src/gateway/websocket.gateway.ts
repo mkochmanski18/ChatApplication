@@ -5,6 +5,7 @@ import { Server } from "socket.io";
 import { Conversation } from "src/conversation/conversation.entity";
 import { ConversationService } from "src/conversation/conversation.service";
 import { FriendService } from "src/friend/friend.service";
+import { User } from "src/user/user.entity";
 import { ExtededSocket } from "src/utils/interfaces";
 import { GatewaySessionManager } from "./gateway.session";
 
@@ -84,17 +85,13 @@ export class MessageGateway implements OnGatewayConnection, OnGatewayDisconnect{
     }
 
     @OnEvent('friend.update')
-    async handleFriendUpdateEvent(@MessageBody() data:any){
+    async handleFriendUpdateEvent(@MessageBody() data:User[]){
       console.log('Inside friend.update');
       
-      const { user,friend} = data;
-      
-        const userSocket = this.sessions.getUserSocket(friend);
+      data.map(user=>{
+        const userSocket = this.sessions.getUserSocket(user.userid);
         if (userSocket) userSocket.emit('onFriendUpdate');
-
-        const friendSocket = this.sessions.getUserSocket(user);
-        if (friendSocket) friendSocket.emit('onFriendUpdate');
-     
+      })
     }
 
     @SubscribeMessage('getOnlineUsers')
