@@ -18,6 +18,7 @@
   }
 
   export enum ConfirmationStatusEnum {
+    FOREIGN,
     REMAINING,
     CONFIRMED,
     REJECTED
@@ -27,4 +28,11 @@
     DAY,
     MONTH,
     YEAR
+  }
+
+  export enum RelationshipType {
+    FOREIGN,
+    INVITED,
+    FRIEND,
+    REJECTED
   }
