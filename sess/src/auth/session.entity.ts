@@ -1,15 +1,19 @@
-import { User } from 'src/user/user.entity';
-import { BaseEntity, Column, Entity, JoinColumn, OneToOne, PrimaryColumn } from 'typeorm';
+import { ISession } from 'connect-typeorm';
+import { BaseEntity, Column, DeleteDateColumn, Entity, Index, JoinColumn, OneToOne, PrimaryColumn } from 'typeorm';
 import { SessionEntity } from 'typeorm-store';
 
 @Entity()
-export class Session extends BaseEntity implements SessionEntity {
-    @PrimaryColumn()
+export class Session extends BaseEntity implements ISession {
+    @Index()
+    @Column('bigint')
+    expiredAt: number = Date.now();
+
+    @PrimaryColumn('varchar', { length: 255 })
     id: string;
 
-    @Column()
-    expiresAt: number;
+    @Column('text')
+    json: string;
 
-    @Column()
-    data: string;
+    @DeleteDateColumn()
+    destroyedAt: Date;
 }

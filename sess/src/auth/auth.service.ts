@@ -13,6 +13,8 @@ export class AuthService {
         const userData = {
             userid:user.userid,
             name:user.name,
+            firstname:user.firstname,
+            lastname:user.lastname,
             sex:user.sex,
             email:user.sex,
             role:user.role
