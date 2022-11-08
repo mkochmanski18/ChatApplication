@@ -31,7 +31,7 @@ import { UserModule } from './user/user.module';
       port:3306,
       username:'root',
       password:'',
-      database:"charliedb",
+      database:"chatdb",
       entities:["dist/**/**.entity{.ts,.js}"],
       bigNumberStrings: false,
       logging: false,

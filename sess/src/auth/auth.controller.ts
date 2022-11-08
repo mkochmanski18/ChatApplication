@@ -35,7 +35,7 @@ export class AuthController {
     res.send(req.user);
   }
 
-  @Post('logout')
+  @Get('logout')
   @UseGuards(AuthenticatedGuard)
   logout(@Req() req: Request, @Res() res: Response) {
     req.logout((err) => {
