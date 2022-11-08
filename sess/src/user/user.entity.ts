@@ -2,7 +2,7 @@ import { Conversation } from "src/conversation/conversation.entity";
 import { Friend } from "src/friend/friend.entity";
 import { UserRoleEnum } from "src/utils/types";
 import { Message } from "src/message/message.entity";
-import { BaseEntity, Column, Entity,JoinColumn,JoinTable,ManyToMany,OneToMany,OneToOne,PrimaryGeneratedColumn } from "typeorm";
+import { BaseEntity, Column, Entity,Index,JoinColumn,JoinTable,ManyToMany,OneToMany,OneToOne,PrimaryGeneratedColumn } from "typeorm";
 import { Token } from "./token.entity";
 
 @Entity()
@@ -10,10 +10,23 @@ export class User extends BaseEntity{
     @PrimaryGeneratedColumn('uuid')
     userid: string;
 
+    @Index({ fulltext: true })
     @Column({
         length: 25,
     })
     name: string;
+
+    @Index({ fulltext: true })
+    @Column({
+        length: 25,
+    })
+    firstname: string;
+
+    @Index({ fulltext: true })
+    @Column({
+        length: 25,
+    })
+    lastname: string;
 
     @Column({
         length: 6,
@@ -43,11 +56,6 @@ export class User extends BaseEntity{
         nullable:true,
     })
     photo: string;
-
-    @Column({
-        nullable:true,
-    })
-    sessionId:string;
 
     @OneToOne(() => Token)
     tokens: Token[];

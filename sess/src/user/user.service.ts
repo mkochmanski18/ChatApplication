@@ -17,12 +17,12 @@ const nodemailer = require("nodemailer");
 export class UserService {
 
     regFilter(user:User):userData{
-        const {userid, name, sex, email, role} = user;
-        return {userid,name,sex,email, role};
+        const {userid, name,firstname,lastname, sex, email, role} = user;
+        return {userid,name,firstname,lastname,sex,email, role};
     }
     userDataFilter(user:User):userData{
-      const {userid, name,email, sex, role} = user;
-      return {userid,name,email,sex, role};
+      const {userid, name,firstname,lastname,email, sex, role} = user;
+      return {userid,name,firstname,lastname,email,sex, role};
   }
 
   transporter = nodemailer.createTransport({
@@ -65,8 +65,10 @@ createToken(tokenId:string, user: userData, type:TokenTypeEnum): string {
             }
             else{
                 const user = new User();
-                user.email = newUser.email;
                 user.name = newUser.name;
+                user.email = newUser.email;
+                user.firstname = newUser.firstname;
+                user.lastname=newUser.lastname;
                 user.sex = newUser.sex;
                 user.role = UserRoleEnum.REGULAR;
                 user.pwdHash = hashPwd(newUser.pwd);
@@ -75,25 +77,25 @@ createToken(tokenId:string, user: userData, type:TokenTypeEnum): string {
                 console.log("[CHAT][INFO] "+new Date().toUTCString()+" - User: "+ user.name+"["+user.email+"] Created!");
 
                 //sending mail with confirmation
-                let message:string = "Hello "+user.name+"!\n This email has been generated automaticaly. Don't answer this message.\n"+
+                let message:string = "Hello "+user.name+" "+user.firstname+"!\n This email has been generated automaticaly. Don't answer this message.\n"+
                 "It contains account confirmation link. If you got this mail by accident, just ignore this mail.\n "+
                 "If you're expecting this email, just click in link below.\n"+address+":"+port+"/user/confirmation/"+user.userid;
                 let htmlmessage = 
-                "<div style='text-align:center'><h5>Hello "+user.name+"!</h5><p>This email has been generated automaticaly. Don't answer this message.</p>"+
+                "<div style='text-align:center'><h5>Hello "+user.firstname+"!</h5><p>This email has been generated automaticaly. Don't answer this message.</p>"+
                 "<p>It contains account confirmation link. If you got this mail by accident, just ignore this mail.</p>"+
                 "<p>If you're expecting this email, just click in link below.</p>"+
                 "<p>"+address+":"+port+"/user/confirmation/"+user.userid+"</p></div>";
 
                 console.log(message)
-                let info = await this.transporter.sendMail({
-                  from: '"ChatApplication" <mail@chatapp.com>', // sender address
-                  to: user.email, // list of receivers
-                  subject: "Confirm email account!", // Subject line
-                  text: message, // plain text body
-                  html: htmlmessage, // html body
-                });
+                // let info = await this.transporter.sendMail({
+                //   from: '"ChatApplication" <mail@chatapp.com>', // sender address
+                //   to: user.email, // list of receivers
+                //   subject: "Confirm email account!", // Subject line
+                //   text: message, // plain text body
+                //   html: htmlmessage, // html body
+                // });
               
-                console.log("[INFO] "+new Date().toUTCString()+" - Message sent: %s", info.messageId);
+                //console.log("[INFO] "+new Date().toUTCString()+" - Message sent: %s", info.messageId);
                 return user;
             }
         }
@@ -159,22 +161,22 @@ createToken(tokenId:string, user: userData, type:TokenTypeEnum): string {
         await user.save();
         //sending mail with confirmation
         let message = 
-        "Hello "+user.name+"!\n This email has been generated automaticaly. Don't answer this message. \nIt contains reset password link. If you got this mail by accident, just ignore this mail.\nIf you're expecting this email, just click in link below, to reset your account password.\n"+address+":"+port+"/user/reset/"+token;
+        "Hello "+user.firstname+"!\n This email has been generated automaticaly. Don't answer this message. \nIt contains reset password link. If you got this mail by accident, just ignore this mail.\nIf you're expecting this email, just click in link below, to reset your account password.\n"+address+":"+port+"/user/reset/"+token;
         let htmlmessage = 
-        "<div style='text-align:center'><h5>Hello "+user.name+"!</h5><p>This email has been generated automaticaly. Don't answer this message.</p>"+
+        "<div style='text-align:center'><h5>Hello "+user.firstname+"!</h5><p>This email has been generated automaticaly. Don't answer this message.</p>"+
         "<p>It contains reset password link. If you got this mail by accident, just ignore this mail.</p>"+
         "<p>If you're expecting this email, just click in link below, to reset your account password</p>"+
         "<p>"+address+":"+port+"/user/reset/"+token+"</p></div>";
         console.log(message)
-        let info = await this.transporter.sendMail({
-          from: '"ChatApp" <mail@chatapp.com>', // sender address
-          to: user.email, // list of receivers
-          subject: "Reset Account password!", // Subject line
-          text: message, // plain text body
-          html: htmlmessage, // html body
-        });
+        // let info = await this.transporter.sendMail({
+        //   from: '"ChatApp" <mail@chatapp.com>', // sender address
+        //   to: user.email, // list of receivers
+        //   subject: "Reset Account password!", // Subject line
+        //   text: message, // plain text body
+        //   html: htmlmessage, // html body
+        // });
       
-        console.log("[CHAT][INFO] "+new Date().toUTCString()+" - Reset Link in Message sent: %s", info.messageId);
+        //console.log("[CHAT][INFO] "+new Date().toUTCString()+" - Reset Link in Message sent: %s", info.messageId);
         throw new HttpException({message:"Reset Password Link Sended"}, HttpStatus.OK)
     }
 
@@ -207,7 +209,7 @@ createToken(tokenId:string, user: userData, type:TokenTypeEnum): string {
         
         const searchedUser = await getRepository(User)
         .createQueryBuilder("user")
-        .select("user.userid,user.name,user.sex,user.email")
+        .select("user.userid,user.name,user.firstname,user.lastname,user.sex,user.email,user.photo")
         .where("userid=:userid",{userid})
         .getRawOne();
         if(!searchedUser)
@@ -215,22 +217,18 @@ createToken(tokenId:string, user: userData, type:TokenTypeEnum): string {
         return searchedUser;
       }
 
-      async searchUserByName(name:string):Promise<HttpException|userData>{
+      async searchUserByName(name:string):Promise<HttpException|userData[]>{
         
-        const searchedUser = await getRepository(User)
-        .createQueryBuilder("user")
-        .select("user.userid,user.name,user.sex,user.email")
-        .where("name=:name",{name})
-        .getRawOne();
+        const searchedUser = User.query("SELECT * FROM `user` WHERE name like ? or firstname like ? or lastname like ?",[`%${name}%`,`%${name}%`,`%${name}%`]);
         if(!searchedUser)
-          throw new HttpException("User doesn't exist!", HttpStatus.NOT_FOUND);
+          throw new HttpException("User doesn't exist!", HttpStatus.NOT_FOUND)
         return searchedUser;
       }
 
       async searchUserByEmail(email:string):Promise<HttpException|userData>{
         const searchedUser = await getRepository(User)
         .createQueryBuilder("user")
-        .select("user.userid,user.name,user.sex,user.email")
+        .select("user.userid,user.name,user.firstname,user.lastname,user.sex,user.email,user.photo")
         .where("email=:email",{email})
         .getRawOne();
         if(!searchedUser)
@@ -290,10 +288,11 @@ createToken(tokenId:string, user: userData, type:TokenTypeEnum): string {
         throw new HttpException("User data changed", HttpStatus.OK);
       }
 
-      async uploadPhoto(file,id){
+      async uploadPhoto(file: Express.Multer.File,id: any){
         const user = await User.findOne({userid:id});
         if(!user) throw new HttpException("User doesn't exist!", HttpStatus.NOT_FOUND)
         user.photo = file.filename;
+        console.log(file.filename)
         user.save();
         console.log("[CHAT][INFO] "+new Date().toUTCString()+" - User: "+ user.name+"["+user.email+"] uploaded photo:"+file.filename+"!");
         throw new HttpException("Photo has been uploaded", HttpStatus.CREATED)

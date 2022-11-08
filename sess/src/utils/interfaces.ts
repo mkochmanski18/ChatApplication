@@ -14,6 +14,8 @@ export interface friendData{
 export interface userData{
     userid:string;
     name:string;
+    firstname:string;
+    lastname:string;
     email:string;
     sex:string;
     role:UserRoleEnum,

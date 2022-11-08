@@ -5,6 +5,12 @@ export class RegisterDto {
   name: string;
 
   @ApiProperty()
+  firstname: string;
+
+  @ApiProperty()
+  lastname: string;
+
+  @ApiProperty()
   sex:string;
 
   @ApiProperty()

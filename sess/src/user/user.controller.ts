@@ -16,6 +16,7 @@ import { pwdChangeDto } from './dto/pwdChange.dto';
 import { RolesGuard } from 'src/auth/Guards';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
+import { editFileName } from 'src/utils/editFileName';
 
 @ApiTags('user')
 @Controller('user')
@@ -114,13 +115,13 @@ export class UserController {
     
     //Find a user with certain username
     @UseGuards(AuthenticatedGuard)
-    @Get('search/name/:username')
-    @ApiOperation({ summary: 'Find a user with certain username' })
+    @Get('search/name/:name')
+    @ApiOperation({ summary: 'Find a user with certain name' })
     @ApiResponse({ status: 200, description: 'User found'})
     @ApiResponse({ status: 404, description: "User doesn't exist!"})
     searchUserByName(
-        @Param('username')name:string,
-    ):Promise<HttpException|userData>{
+        @Param('name')name:string,
+    ):Promise<HttpException|userData[]>{
         return this.userService.searchUserByName(name);
     }
 
@@ -207,7 +208,7 @@ export class UserController {
             userId: { type: 'string' },
             file: {
               type: 'string',
-              format: 'binary',
+              format: 'base64',
             },
           },
         },
@@ -215,7 +216,8 @@ export class UserController {
     @ApiOperation({ summary: 'Upload user photo' })
     @UseInterceptors(FileInterceptor('file',{
         storage: diskStorage({
-            destination:'./assets/user-profiles-images',
+            destination:'./assets/user-profile-images',
+            filename:editFileName,
         })
     }))
     uploadFile(
