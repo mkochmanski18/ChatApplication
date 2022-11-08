@@ -26,8 +26,13 @@ export class MessageService {
         message.conversation = conversation;
         message.messageType = MessageTypeEnum.TEXT;
         message.save()
+
+        const {messageId,date,datetime,content,messageType,sender}=message;
+        const {userid,name,firstname,lastname,email,photo} = sender;
+        let senderData = ({userid,name,firstname,lastname,email,photo});
+        const newMessages = {messageId,date,datetime,content,messageType,senderData,conversation};
         
-        this.eventEmitter.emit('message.create',message);
+        this.eventEmitter.emit('message.create',newMessages);
         throw new HttpException({msg:"Message sended",data},HttpStatus.CREATED);
     }
 
