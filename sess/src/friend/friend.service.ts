@@ -3,7 +3,7 @@ import { EventEmitter2 } from '@nestjs/event-emitter';
 import { Conversation } from 'src/conversation/conversation.entity';
 import { userData } from 'src/utils/interfaces';
 import { User } from 'src/user/user.entity';
-import { ConfirmationStatusEnum, ConversationTypeEnum } from 'src/utils/types';
+import { ConfirmationStatusEnum, ConversationTypeEnum, RelationshipType } from 'src/utils/types';
 import { getRepository } from 'typeorm';
 import { Friend } from './friend.entity';
 
@@ -77,14 +77,6 @@ export class FriendService {
         const result = await relation.save();
         if(!result) throw new HttpException("Invitation doesn't exist",HttpStatus.NOT_FOUND);
 
-        const conversation = new Conversation();
-        conversation.creator = friend;
-        conversation.createdAt = new Date();
-        conversation.conversationType = ConversationTypeEnum.REGULAR;
-        
-        conversation.participants = [user, friend];
-        conversation.save();
-
         console.log("[CHAT][INFO] "+new Date().toUTCString()+" - User: "+ user.name+"["+user.email+"] rejected relation with User: "+friend.name+"["+friend.email+"]"+"!");
         this.eventEmitter.emit('friend.update',{user,friend});
         throw new HttpException("Invitation rejected",HttpStatus.OK);
@@ -99,7 +91,7 @@ export class FriendService {
             .createQueryBuilder("user")
             .select("user.userid,user.name,user.sex,user.email")
             .leftJoin("user.users","friend")
-            .where("friend.confirmatonStatus=:status AND friend.friendUserid=:id",{status:0,id:user.userid})
+            .where("friend.confirmatonStatus=:status AND friend.friendUserid=:id",{status:ConfirmationStatusEnum.REMAINING,id:user.userid})
             .orderBy({
               "user.name": "ASC",
             })
@@ -124,12 +116,25 @@ export class FriendService {
         return invitations;
     }
 
+    async isFriend(userid: string, friendid: string): Promise<RelationshipType | HttpException> {
+        const user = await getRepository(Friend)
+        .createQueryBuilder("friend")
+        .select("friend.confirmatonStatus,user.userid,user.name,user.sex,user.email")
+        .leftJoin("friend.friend","user")
+        .where("friend.userUserid=:id AND friend.friendUserid=:fid",{id:userid,fid:friendid})
+        .orWhere("friend.friendUserid=:id AND friend.userUserid=:fid",{id:userid,fid:friendid})
+        .getRawOne();
+        console.log(user.confirmatonStatus)
+        if(!user) return RelationshipType.FOREIGN;
+        else return user.confirmatonStatus;
+    }
+
     async getFriendList(userid: string): Promise<userData[]> {
         const user = await User.findOne({userid});
         if(!user)
             throw new HttpException("User doesn't exist",HttpStatus.NOT_FOUND);
         
-            const invitations = await getRepository(Friend)
+        const flist = await getRepository(Friend)
             .createQueryBuilder("friend")
             .select("user.userid,user.name,user.sex,user.email")
             .leftJoin("friend.friend","user")
@@ -139,7 +144,8 @@ export class FriendService {
               "friend.friendUserid": "ASC",
             })
             .getRawMany();
-        return invitations;
+            
+        return flist;
     }
 
     async deleteFriend(userid:string,friendid:string):Promise<HttpException> {

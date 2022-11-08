@@ -7,6 +7,7 @@ import {
     ApiTags,
   } from '@nestjs/swagger';
 import { AuthenticatedGuard } from 'src/auth/Guards';
+import { RelationshipType } from 'src/utils/types';
 
 @ApiTags('friend')
 @Controller('friend')
@@ -64,6 +65,19 @@ export class FriendController {
         @Query("userid") userid: string,
     ):Promise<HttpException|userData[]>{
         return this.friendService.getInvitations(userid);
+    }
+
+    //Check if user is your friend
+    @UseGuards(AuthenticatedGuard)
+    @Get('isFriend')
+    @ApiOperation({ summary: 'Check if user is your friend' })
+    @ApiResponse({ status: 200, description: 'Operation succedd'})
+    @ApiResponse({ status: 404, description: "User Account doesn't exists"})
+    isFriend(
+        @Query("userid") userid: string,
+        @Query("friendid") friendid:string
+    ):Promise<HttpException|RelationshipType>{
+        return this.friendService.isFriend(userid,friendid);
     }
 
     //Get a list of confirmed friends
