@@ -7,6 +7,7 @@ import {
   } from '@nestjs/swagger';
 import { AuthenticatedGuard } from 'src/auth/Guards';
 import { Message } from 'src/message/message.entity';
+import { User } from 'src/user/user.entity';
 import { Conversation } from './conversation.entity';
 import { ConversationService } from './conversation.service';
 import { ConversationDto } from './dto/conversation.dto';
@@ -17,6 +18,18 @@ export class ConversationController {
     constructor(
         @Inject(ConversationService) private conversationService: ConversationService,
     ){}
+
+    //Show all user's conversations
+    @UseGuards(AuthenticatedGuard)
+    @Get('user/:userid')
+    @ApiOperation({ summary: 'Show all informations about conversation' })
+    @ApiResponse({ status: 200, description: 'Conversation downloaded.'})
+    @ApiResponse({ status: 404, description: "Conversation doesn't exist"})
+    getUserConversations(
+        @Param('userid') userid:string, 
+    ):Promise<HttpException|User[]|Conversation[]>{
+        return this.conversationService.getUserConversations(userid);
+    }
 
     //Show all informations about conversation
     @UseGuards(AuthenticatedGuard)

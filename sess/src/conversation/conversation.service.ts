@@ -2,14 +2,18 @@ import {HttpException, HttpStatus, Injectable} from '@nestjs/common';
 import { Message } from 'src/message/message.entity';
 import { User } from 'src/user/user.entity';
 import { ConversationTypeEnum } from 'src/utils/types';
-import { getRepository } from 'typeorm';
+import { getManager, getRepository } from 'typeorm';
 import { Conversation } from './conversation.entity';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { ConversationDto } from './dto/conversation.dto';
+import { FriendService } from 'src/friend/friend.service';
 
 @Injectable()
 export class ConversationService {
-  constructor(private eventEmitter: EventEmitter2){}
+  constructor(
+    private eventEmitter: EventEmitter2,
+    private friendService: FriendService
+    ){}
 
     async changeName(conversationid: string, newname: string): Promise<HttpException> {
         const conversation = await Conversation.findOne(conversationid);
@@ -72,13 +76,54 @@ export class ConversationService {
         this.eventEmitter.emit('conversation.create',conversationObject);
         return conversation;
     }
+
+    async getUserConversations(userid:string): Promise<HttpException|User[]|Conversation[]>{
+        const user = User.findOne({userid});
+        if(!user) throw new HttpException("User doesn't exist",HttpStatus.NOT_FOUND);
+
+        const query = await User.createQueryBuilder("user")
+        .leftJoinAndSelect("user.conversations","conv")
+        .leftJoinAndSelect("conv.participants","participant")
+        .where("user.userid=:id",{id:userid})
+        .getOne();
+        let newConversationsArray = [];
+        if(query){
+        const {conversations} = query;
+        conversations.map(conv=>{
+            const {conversationId,name,createdAt,conversationType,participants}=conv;
+            let newParticipantsArray = [];
+            participants.map(participant=>{
+                const {userid,name,firstname,lastname,email,photo} = participant;
+                newParticipantsArray.push({userid,name,firstname,lastname,email,photo});
+            });
+            newConversationsArray.push({conversationId,name,createdAt,conversationType,newParticipantsArray});
+        })
+    }
+        return newConversationsArray;
+    }
     
     async getMessages(conversationid: string): Promise<HttpException|Message[]> {
         const conversation = await Conversation.findOne({conversationId:conversationid});
         if(!conversation) throw new HttpException("Conversation doesn't exist",HttpStatus.NOT_FOUND);
-        const messages = await Message.find({conversation}) 
-        return messages;
-       
+        
+        const messages = await Message.createQueryBuilder("message")
+        .leftJoinAndSelect("message.sender","sender")
+        .leftJoinAndSelect("message.conversation","conversation")
+        .where("conversation.conversationId=:id",{id:conversation.conversationId})
+        .orderBy("message.datetime","ASC")
+        .getMany();
+        console.log(messages)
+        let newMessagesArray=[];
+        messages.map(message=>{
+            const {messageId,date,datetime,content,messageType,sender,conversation}=message;
+            
+            
+            const {userid,name,firstname,lastname,email,photo} = sender;
+            let senderData = ({userid,name,firstname,lastname,email,photo});
+            
+            newMessagesArray.push({messageId,date,datetime,content,messageType,senderData,conversation});
+        })
+        return newMessagesArray;
     }
     
     async getParticipants(conversationid: string): Promise<HttpException|Conversation> {
