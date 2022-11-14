@@ -11,5 +11,5 @@ export class MessageDto {
     datetime: Date;
 
     @ApiProperty()
-    text: string;
+    text?: string;
 }

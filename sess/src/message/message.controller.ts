@@ -51,8 +51,11 @@ export class MessageController {
   sendImageMessage(
     @UploadedFile() file: Express.Multer.File,
     @Body() data:any,
+    @Query("userid")userid:string,
+    @Query("conversationid")conversationid:string,
   ):Promise<HttpException>{
       return this.messageService.sendImageMessage(data,file);
+      return this.messageService.sendImageMessage(userid,conversationid,file);
   }
 
     //Show all sended messages

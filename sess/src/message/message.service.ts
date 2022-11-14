@@ -36,16 +36,17 @@ export class MessageService {
         throw new HttpException({msg:"Message sended",data},HttpStatus.CREATED);
     }
 
-    async sendImageMessage(data,file): Promise<HttpException> {
-      const user = await User.findOne({userid:data.senderId});
+    async sendImageMessage(userid:string,conversationid:string,file:Express.Multer.File): Promise<HttpException> {
+      const user = await User.findOne({userid});
       if(!user) throw new HttpException("Sender User id is incorrect",HttpStatus.BAD_REQUEST)
       
-      const conversation = await Conversation.findOne({conversationId:data.conversationId});
+      const conversation = await Conversation.findOne({conversationId:conversationid});
       if(!conversation) throw new HttpException("Conversation doesn't exist",HttpStatus.BAD_REQUEST)
 
       let message = new Message;
-      message.date = data.datetime.toDateString().split('-14')[0];
-      message.datetime = data.datetime;
+      const data = new Date();
+      message.date = data.toDateString().split('-14')[0];
+      message.datetime = data;
       message.sender = user;
       message.conversation = conversation;
       message.content = file.filename;
