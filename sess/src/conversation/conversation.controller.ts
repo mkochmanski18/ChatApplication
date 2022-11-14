@@ -93,7 +93,7 @@ export class ConversationController {
     }
 
     //Change Conversation name
-    @UseGuards(AuthenticatedGuard)
+    @UseGuards(AuthenticatedGuard,ConversationOwnerGuard)
     @Patch('name')
     @ApiOperation({ summary: 'Change Conversation name' })
     @ApiResponse({ status: 200, description: 'Conversation name changed'})
@@ -106,7 +106,7 @@ export class ConversationController {
     }
 
     //Add new Participant to conversation
-    @UseGuards(AuthenticatedGuard)
+    @UseGuards(AuthenticatedGuard,ConversationOwnerGuard)
     @Patch('participants')
     @ApiOperation({ summary: 'Add new Participant to conversation' })
     @ApiResponse({ status: 200, description: 'PArticipant has been added'})
@@ -119,7 +119,7 @@ export class ConversationController {
     }
 
     //Change conversation's owner
-    @UseGuards(AuthenticatedGuard)
+    @UseGuards(AuthenticatedGuard,ConversationOwnerGuard)
     @Patch('owner')
     @ApiOperation({ summary: 'Change conversations owner' })
     @ApiResponse({ status: 200, description: 'PArticipant has been added'})
@@ -131,8 +131,8 @@ export class ConversationController {
         return this.conversationService.changeOwner(conversationid,userid);
     }
 
-    //Delete new Participant to conversation
-    @UseGuards(AuthenticatedGuard)
+    //Delete Participant from conversation
+    @UseGuards(AuthenticatedGuard,ConversationOwnerGuard)
     @Delete('participants')
     @ApiOperation({ summary: 'Delete participant from Conversation' })
     @ApiResponse({ status: 200, description: 'Participant deleted'})
