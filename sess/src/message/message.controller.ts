@@ -2,7 +2,7 @@ import { Body, Controller, Get, HttpException, Post,Query,Res,UploadedFile,UseGu
 import { FileInterceptor } from '@nestjs/platform-express/multer';
 import { ApiBody, ApiConsumes, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { diskStorage } from 'multer';
-import { AuthenticatedGuard } from 'src/auth/Guards';
+import { AuthenticatedGuard, UserIdentityGuard } from 'src/auth/Guards';
 import { MessageDto } from './dto/message.dto';
 import { MessageService } from './message.service';
 
@@ -24,14 +24,13 @@ export class MessageController {
     }
 
     //Create new message with image
-  @UseGuards(AuthenticatedGuard)
+  @UseGuards(AuthenticatedGuard,UserIdentityGuard)
   @Post('newImage')
   @ApiConsumes('multipart/form-data')
   @ApiBody({
         schema: {
           type: 'object',
           properties: {
-            userId: { type: 'string' },
             file: {
               type: 'string',
               format: 'binary',
@@ -50,16 +49,14 @@ export class MessageController {
   @ApiResponse({ status: 404, description: "Incorrect Username"})
   sendImageMessage(
     @UploadedFile() file: Express.Multer.File,
-    @Body() data:any,
     @Query("userid")userid:string,
     @Query("conversationid")conversationid:string,
   ):Promise<HttpException>{
-      return this.messageService.sendImageMessage(data,file);
       return this.messageService.sendImageMessage(userid,conversationid,file);
   }
 
     //Show all sended messages
-    @UseGuards(AuthenticatedGuard)
+    @UseGuards(AuthenticatedGuard,UserIdentityGuard)
     @Get()
     @ApiOperation({ summary: 'Show sended messages' })
     @ApiResponse({ status: 200, description: 'Messages downloaded.'})

@@ -5,7 +5,7 @@ import {
     ApiResponse,
     ApiTags,
   } from '@nestjs/swagger';
-import { AuthenticatedGuard } from 'src/auth/Guards';
+import { AuthenticatedGuard, ConversationOwnerGuard, UserIdentityGuard } from 'src/auth/Guards';
 import { Message } from 'src/message/message.entity';
 import { User } from 'src/user/user.entity';
 import { Conversation } from './conversation.entity';
@@ -20,7 +20,7 @@ export class ConversationController {
     ){}
 
     //Show all user's conversations
-    @UseGuards(AuthenticatedGuard)
+    @UseGuards(AuthenticatedGuard,UserIdentityGuard)
     @Get('user/:userid')
     @ApiOperation({ summary: 'Show all informations about conversation' })
     @ApiResponse({ status: 200, description: 'Conversation downloaded.'})
@@ -68,7 +68,7 @@ export class ConversationController {
     }
 
     //Create Conversation
-    @UseGuards(AuthenticatedGuard)
+    @UseGuards(AuthenticatedGuard,UserIdentityGuard)
     @Post('')
     @ApiOperation({ summary: 'Create new Conversation' })
     @ApiResponse({ status: 201, description: 'Conversation created.'})
@@ -80,7 +80,7 @@ export class ConversationController {
     }
 
     //Delete Conversation
-    @UseGuards(AuthenticatedGuard)
+    @UseGuards(AuthenticatedGuard,ConversationOwnerGuard)
     @Delete(':conversationid')
     @ApiOperation({ summary: 'Delete Conversation' })
     @ApiResponse({ status: 200, description: 'Conversation deleted'})

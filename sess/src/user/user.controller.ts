@@ -11,7 +11,7 @@ import {
     ApiResponse,
     ApiTags,
   } from '@nestjs/swagger';
-import { AuthenticatedGuard } from 'src/auth/Guards';
+import { AuthenticatedGuard, UserIdentityGuard } from 'src/auth/Guards';
 import { pwdChangeDto } from './dto/pwdChange.dto';
 import { RolesGuard } from 'src/auth/Guards';
 import { FileInterceptor } from '@nestjs/platform-express';
@@ -38,7 +38,7 @@ export class UserController {
         return this.userService.register(newUser);
     }
     
-    @UseGuards(AuthenticatedGuard)
+    @UseGuards(AuthenticatedGuard,UserIdentityGuard)
     @Delete()
     @ApiOperation({ summary: 'User account deletion' })
     @ApiResponse({ status: 200, description: 'User account deleted successfuly.'})
@@ -63,7 +63,7 @@ export class UserController {
     }
 
     //User password change
-    @UseGuards(AuthenticatedGuard)
+    @UseGuards(AuthenticatedGuard,UserIdentityGuard)
     @Patch('/password')
     @ApiOperation({ summary: 'User password changing' })
     @ApiResponse({ status: 200, description: 'User account password changed'})
@@ -139,7 +139,7 @@ export class UserController {
     }
 
     //Changing Username
-    @UseGuards(AuthenticatedGuard)
+    @UseGuards(AuthenticatedGuard,UserIdentityGuard)
     @Patch('name')
     @ApiOperation({ summary: 'Change username' })
     @ApiResponse({ status: 200, description: 'User data changed'})
@@ -154,7 +154,7 @@ export class UserController {
     }
 
     //Changing email
-    @UseGuards(AuthenticatedGuard)
+    @UseGuards(AuthenticatedGuard,UserIdentityGuard)
     @Patch('email')
     @ApiOperation({ summary: 'Change user email' })
     @ApiResponse({ status: 200, description: 'User data changed'})
@@ -169,7 +169,7 @@ export class UserController {
     }
 
     //Changing sex
-    @UseGuards(AuthenticatedGuard)
+    @UseGuards(AuthenticatedGuard,UserIdentityGuard)
     @Patch('sex')
     @ApiOperation({ summary: 'Change user sex' })
     @ApiResponse({ status: 200, description: 'User data changed'})
@@ -196,7 +196,8 @@ export class UserController {
         return this.userService.changeUserRole(userid,newrole);
     }
 
-    @Post('photo')
+    @UseGuards(AuthenticatedGuard,UserIdentityGuard)
+    @Post('photo/:userid')
     @ApiResponse({ status: 201, description: 'Photo has been uploaded'})
     @ApiResponse({ status: 404, description: "User doesn't exist!"})
     @ApiResponse({ status: 500, description: 'Internal server error'})
@@ -205,7 +206,6 @@ export class UserController {
         schema: {
           type: 'object',
           properties: {
-            userId: { type: 'string' },
             file: {
               type: 'string',
               format: 'base64',
@@ -222,11 +222,12 @@ export class UserController {
     }))
     uploadFile(
         @UploadedFile() file: Express.Multer.File,
-        @Body()body:any,
+        @Param("userid") userid:string,
         ){
-            return this.userService.uploadPhoto(file,body.userId);
+            return this.userService.uploadPhoto(file,userid);
     }
 
+    @UseGuards(AuthenticatedGuard)
     @Get('photo/:photoname')
     @ApiResponse({ status: 200, description: 'Photo has been uploaded'})
     @ApiResponse({ status: 404, description: "Photo doesn't exist!"})

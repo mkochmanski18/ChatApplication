@@ -6,7 +6,7 @@ import {
     ApiResponse,
     ApiTags,
   } from '@nestjs/swagger';
-import { AuthenticatedGuard } from 'src/auth/Guards';
+import { AuthenticatedGuard, UserIdentityGuard } from 'src/auth/Guards';
 import { RelationshipType } from 'src/utils/types';
 
 @ApiTags('friend')
@@ -17,7 +17,7 @@ export class FriendController {
     ){}
 
     //Friend invitation 
-    @UseGuards(AuthenticatedGuard)
+    @UseGuards(AuthenticatedGuard,UserIdentityGuard)
     @Post('/invitation')
     @ApiOperation({ summary: 'Invitation to a new friend' })
     @ApiResponse({ status: 201, description: 'User invited.'})
@@ -30,7 +30,7 @@ export class FriendController {
     }
 
     //Confirmation of the relation between users
-    @UseGuards(AuthenticatedGuard)
+    @UseGuards(AuthenticatedGuard,UserIdentityGuard)
     @Patch('/invitation/confirm')
     @ApiOperation({ summary: 'Confirm invitation from friend' })
     @ApiResponse({ status: 200, description: 'Invitation confirmed.'})
@@ -43,7 +43,7 @@ export class FriendController {
     }
 
     //Reject of the getting relation with user
-    @UseGuards(AuthenticatedGuard)
+    @UseGuards(AuthenticatedGuard,UserIdentityGuard)
     @Patch('/invitation/reject')
     @ApiOperation({ summary: 'Reject invitation from friend' })
     @ApiResponse({ status: 200, description: 'Invitation rejected.'})
@@ -56,7 +56,7 @@ export class FriendController {
     }
 
     //Get a list of invitations
-    @UseGuards(AuthenticatedGuard)
+    @UseGuards(AuthenticatedGuard,UserIdentityGuard)
     @Get('invitation')
     @ApiOperation({ summary: 'Get a list of invitations' })
     @ApiResponse({ status: 200, description: 'Invitations found.'})
@@ -68,7 +68,7 @@ export class FriendController {
     }
 
     //Check if user is your friend
-    @UseGuards(AuthenticatedGuard)
+    @UseGuards(AuthenticatedGuard,UserIdentityGuard)
     @Get('isFriend')
     @ApiOperation({ summary: 'Check if user is your friend' })
     @ApiResponse({ status: 200, description: 'Operation succedd'})
@@ -81,7 +81,7 @@ export class FriendController {
     }
 
     //Get a list of confirmed friends
-    @UseGuards(AuthenticatedGuard)
+    @UseGuards(AuthenticatedGuard,UserIdentityGuard)
     @Get('list')
     @ApiOperation({ summary: 'Get a list of confirmed friends' })
     @ApiResponse({ status: 200, description: 'Friends found.'})
@@ -93,7 +93,7 @@ export class FriendController {
     }
 
     //Delete user from friend list
-    @UseGuards(AuthenticatedGuard)
+    @UseGuards(AuthenticatedGuard,UserIdentityGuard)
     @Delete()
     @ApiOperation({ summary: 'Delete user from friend list' })
     @ApiResponse({ status: 200, description: 'User deleted from list.'})
