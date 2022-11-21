@@ -53,7 +53,6 @@ export class UserIdentityGuard implements CanActivate {
     if(context.switchToHttp().getRequest().query.userid) userid = context.switchToHttp().getRequest().query.userid;
     if(context.switchToHttp().getRequest().body.id) userid = context.switchToHttp().getRequest().body.id;
     if(context.switchToHttp().getRequest().body.ownerID) userid = context.switchToHttp().getRequest().body.ownerID;
-    console.log(userid)
     if(user.userid===userid)return true;
     else return false;
     
@@ -64,16 +63,17 @@ export class ConversationOwnerGuard implements CanActivate {
   async canActivate(
     context: ExecutionContext,
   ): Promise<boolean> {
-    const data = context.switchToHttp().getRequest();
+    const user = context.switchToHttp().getRequest().user;
     let conversationId;
     if(context.switchToHttp().getRequest().params.conversationid)conversationId=context.switchToHttp().getRequest().params.conversationid;
-    const ownerId = await Conversation.createQueryBuilder("conversation")
-    .leftJoin("conversation.creator","creator")
-    .where("conversation.conversationId=:id",{id:conversationId})
+    if(context.switchToHttp().getRequest().query.conversationid) conversationId = context.switchToHttp().getRequest().query.conversationid;
+    if(context.switchToHttp().getRequest().body.conversationid) conversationId = context.switchToHttp().getRequest().body.conversationid;
+    const owner = await User.createQueryBuilder("user")
+    .leftJoinAndSelect("user.ownings","conversations")
+    .where("conversations.conversationId=:id",{id:conversationId})
     .getOne();
-
-    console.log(conversationId,ownerId);
-    return false;
     
+    if(owner.userid===user.userid) return true;
+    else return false;
   }
 }
