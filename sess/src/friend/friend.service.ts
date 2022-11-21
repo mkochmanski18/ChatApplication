@@ -89,7 +89,7 @@ export class FriendService {
 
             const invitations = await getRepository(User)
             .createQueryBuilder("user")
-            .select("user.userid,user.name,user.sex,user.email")
+            .select("user.userid,user.firstname,user.lastname,user.name,user.sex,user.email")
             .leftJoin("user.users","friend")
             .where("friend.confirmatonStatus=:status AND friend.friendUserid=:id",{status:ConfirmationStatusEnum.REMAINING,id:user.userid})
             .orderBy({
@@ -106,7 +106,7 @@ export class FriendService {
 
             const invitations = await getRepository(User)
             .createQueryBuilder("user")
-            .select("user.userid,user.name,user.sex,user.email")
+            .select("user.userid,user.firstname,user.lastname,user.name,user.sex,user.email")
             .leftJoin("user.users","friend")
             .where("friend.confirmatonStatus=:status AND friend.friendUserid=:id",{status:2,id:user.userid})
             .orderBy({
@@ -136,7 +136,7 @@ export class FriendService {
         
         const flist = await getRepository(Friend)
             .createQueryBuilder("friend")
-            .select("user.userid,user.name,user.sex,user.email")
+            .select("user.userid,user.firstname,user.lastname,user.name,user.sex,user.email")
             .leftJoin("friend.friend","user")
             .where("friend.confirmatonStatus=:status AND friend.userUserid=:id",{status:1,id:user.userid})
             .orWhere("friend.confirmatonStatus=:status AND friend.friendUserid=:id",{status:1,id:user.userid})
