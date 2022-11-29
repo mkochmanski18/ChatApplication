@@ -9,10 +9,6 @@ import { Conversation } from 'src/conversation/conversation.entity';
 export class LocalAuthGuard extends AuthGuard('local') {
     async canActivate(context: ExecutionContext) {
       
-      // const user = await User.findOne({userid:req.user.userid})
-      // console.log(user,req.sessionID)
-      // user.sessionId = req.sessionID;
-      // user.save();
        const result = (await super.canActivate(context)) as boolean;
        const request = context.switchToHttp().getRequest();
        await super.logIn(request);

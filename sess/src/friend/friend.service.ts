@@ -57,7 +57,7 @@ export class FriendService {
         conversation.save();
 
         console.log("[CHAT][INFO] "+new Date().toUTCString()+" - User: "+ user.name+"["+user.email+"] confirmed relation with User: "+friend.name+"["+friend.email+"]"+"!");
-        this.eventEmitter.emit('friend.update',{user,friend});
+        this.eventEmitter.emit('friend.update',[user,friend]);
         throw new HttpException("Invitation confirmed",HttpStatus.OK);
     }
 
@@ -87,16 +87,17 @@ export class FriendService {
         if(!user)
             throw new HttpException("User doesn't exist",HttpStatus.NOT_FOUND);
 
-            const invitations = await getRepository(User)
-            .createQueryBuilder("user")
-            .select("user.userid,user.firstname,user.lastname,user.name,user.sex,user.email")
-            .leftJoin("user.users","friend")
-            .where("friend.confirmatonStatus=:status AND friend.friendUserid=:id",{status:ConfirmationStatusEnum.REMAINING,id:user.userid})
-            .orderBy({
-              "user.name": "ASC",
-            })
-            .getRawMany();
-        return invitations;
+        const invitations = await getRepository(Friend)
+            .createQueryBuilder("friend")
+            .leftJoinAndSelect("friend.user","user")
+            .where("friend.confirmatonStatus=:status AND friend.friendUserid=:id",{status:ConfirmationStatusEnum.REMAINING,id:userid})
+            .getMany()
+        var invitatingUsers:userData[] = [];
+        invitations.map(relation=>{
+            const {userid,name,firstname,lastname,sex,email,photo} = relation.user;
+            invitatingUsers.push({userid,name,firstname,lastname,sex,email,photo});
+        })
+        return invitatingUsers;
     }
 
     async getRejectedUsers(userid: string): Promise<HttpException|userData[]> {
@@ -138,8 +139,8 @@ export class FriendService {
             .createQueryBuilder("friend")
             .select("user.userid,user.firstname,user.lastname,user.name,user.sex,user.email")
             .leftJoin("friend.friend","user")
-            .where("friend.confirmatonStatus=:status AND friend.userUserid=:id",{status:1,id:user.userid})
-            .orWhere("friend.confirmatonStatus=:status AND friend.friendUserid=:id",{status:1,id:user.userid})
+            .where("friend.confirmatonStatus=:status AND friend.userUserid=:id",{status:ConfirmationStatusEnum.CONFIRMED,id:user.userid})
+            .orWhere("friend.confirmatonStatus=:status AND friend.friendUserid=:id",{status:ConfirmationStatusEnum.CONFIRMED,id:user.userid})
             .orderBy({
               "friend.friendUserid": "ASC",
             })

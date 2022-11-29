@@ -18,8 +18,9 @@ export interface userData{
     lastname:string;
     email:string;
     sex:string;
-    role:UserRoleEnum,
+    role?:UserRoleEnum,
     confirmed?:boolean;
+    photo?:string;
 }
 
 export interface IToken {
