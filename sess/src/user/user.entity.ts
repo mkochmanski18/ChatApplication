@@ -46,9 +46,12 @@ export class User extends BaseEntity{
     @Column()
     pwdHash: string;
 
+    @Column()
+    createdAt: Date;
+
     @Column({
         nullable:true,
-        default: 1,
+        default: 0,
     })
     role:UserRoleEnum;
 

@@ -72,6 +72,7 @@ createToken(tokenId:string, user: userData, type:TokenTypeEnum): string {
                 user.sex = newUser.sex;
                 user.role = UserRoleEnum.REGULAR;
                 user.pwdHash = hashPwd(newUser.pwd);
+                user.createdAt = new Date();
                 
                 await user.save();
                 console.log("[CHAT][INFO] "+new Date().toUTCString()+" - User: "+ user.name+"["+user.email+"] Created!");
