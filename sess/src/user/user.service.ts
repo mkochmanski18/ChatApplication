@@ -26,11 +26,11 @@ export class UserService {
   }
 
   transporter = nodemailer.createTransport({
-    host: "smtp.mailosaur.net",
+    host: "smtp-mail.outlook.com",
     port: 587,
     auth: {
-      user: 'cxiucuiv@mailosaur.net',
-      pass: 'cbi266guPXHdBpAZ'
+      user: 'chatapp18@outlook.com',
+      pass: 'Fp#VHNetLb9Za'
     }
 });
 
@@ -88,15 +88,15 @@ createToken(tokenId:string, user: userData, type:TokenTypeEnum): string {
                 "<p>"+address+":"+port+"/user/confirmation/"+user.userid+"</p></div>";
 
                 console.log(message)
-                // let info = await this.transporter.sendMail({
-                //   from: '"ChatApplication" <mail@chatapp.com>', // sender address
-                //   to: user.email, // list of receivers
-                //   subject: "Confirm email account!", // Subject line
-                //   text: message, // plain text body
-                //   html: htmlmessage, // html body
-                // });
+                let info = await this.transporter.sendMail({
+                  from: '"ChatApplication" <mail@chatapp.com>', // sender address
+                  to: user.email, // list of receivers
+                  subject: "Confirm email account!", // Subject line
+                  text: message, // plain text body
+                  html: htmlmessage, // html body
+                });
               
-                //console.log("[INFO] "+new Date().toUTCString()+" - Message sent: %s", info.messageId);
+                console.log("[INFO] "+new Date().toUTCString()+" - Message sent: %s", info.messageId);
                 return user;
             }
         }
@@ -169,15 +169,15 @@ createToken(tokenId:string, user: userData, type:TokenTypeEnum): string {
         "<p>If you're expecting this email, just click in link below, to reset your account password</p>"+
         "<p>"+address+":"+port+"/user/reset/"+token+"</p></div>";
         console.log(message)
-        // let info = await this.transporter.sendMail({
-        //   from: '"ChatApp" <mail@chatapp.com>', // sender address
-        //   to: user.email, // list of receivers
-        //   subject: "Reset Account password!", // Subject line
-        //   text: message, // plain text body
-        //   html: htmlmessage, // html body
-        // });
+        let info = await this.transporter.sendMail({
+          from: '"ChatApp" <mail@chatapp.com>', // sender address
+          to: user.email, // list of receivers
+          subject: "Reset Account password!", // Subject line
+          text: message, // plain text body
+          html: htmlmessage, // html body
+        });
       
-        //console.log("[CHAT][INFO] "+new Date().toUTCString()+" - Reset Link in Message sent: %s", info.messageId);
+        console.log("[CHAT][INFO] "+new Date().toUTCString()+" - Reset Link in Message sent: %s", info.messageId);
         throw new HttpException({message:"Reset Password Link Sended"}, HttpStatus.OK)
     }
 
