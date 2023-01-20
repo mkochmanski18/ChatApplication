@@ -1,18 +1,18 @@
-
 import Container from 'react-bootstrap/Container';
 import LoginPage from './authPages/loginPage';
 import RegisterPage from './authPages/registerPage';
+import ResetPage from './authPages/resetPage';
 import ErrorPage from './error-page';
 import {
   Route,
   BrowserRouter,
   Routes,
-  useNavigate
 } from "react-router-dom";
 
 import InstanceContext from './context/instance/InstanceContext';
 import ChatContainer from './chatContainer';
 import axios from 'axios';
+import ResetPageRequest from './authPages/resetPageRequest';
 
 function App() {
   
@@ -28,10 +28,17 @@ function App() {
         <InstanceContext.Provider value={instance}>
         <BrowserRouter>
           <Routes>
+            
             <Route path="/login/*" element={<LoginPage/>}>
               
             </Route>
             <Route path="/registration" element={<RegisterPage/>}>
+
+            </Route>
+            <Route path="/reset/:token" element={<ResetPage/>}>
+
+            </Route>
+            <Route path="/resetrequest" element={<ResetPageRequest/>}>
               
             </Route>
             <Route path="/chat/*" element={

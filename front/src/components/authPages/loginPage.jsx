@@ -10,9 +10,7 @@ const LoginPage = () =>{
     const [response,setResponse] = useState();
     const navigate = useNavigate();
     const param = useParams();
-    console.log(param["*"])
     const onSubmit = async (data)=>{
-        console.log("Logging..",data);
 
         await instance.post('/auth/login',{
             email:data.email,
@@ -76,6 +74,12 @@ const LoginPage = () =>{
                         <Form.Text>Nie posiadasz konta? </Form.Text>
                         <Link to="/registration" style={{textDecoration:"none",color:"green"}}>
                             Zarejestuj się
+                        </Link>
+                    </Form.Group>
+                    <Form.Group controlId="formBasicEmail">
+                        <Form.Text>Nie pamiętasz hasła? </Form.Text>
+                        <Link to="/resetrequest" style={{textDecoration:"none",color:"green"}}>
+                            Odzyskaj hasło
                         </Link>
                     </Form.Group>
                 </Form>

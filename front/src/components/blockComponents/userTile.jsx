@@ -1,9 +1,9 @@
 import UserPhoto from "./userPhoto";
 import Actions from "./actions";
-import {useNavigate} from 'react-router-dom';
-import { Card } from "react-bootstrap";
+import {useNavigate, NavLink} from 'react-router-dom';
+import { Button, Card } from "react-bootstrap";
 
-const UserTile = ({user,isConfirmed}) =>{
+const UserTile = ({user}) =>{
     const navigate = useNavigate();
     const userId = localStorage.getItem("userId");
     const opacityDown = (name,state)=>{
@@ -24,9 +24,9 @@ const UserTile = ({user,isConfirmed}) =>{
                 style={{display:"flex",padding:"5px",flexDirection:"row",justifyContent:"flex-start",width:"60%",minWidth:"340px",maxWidth:"500px",margin:"15px auto"}} 
                 key={"userRow."+user.userid}
                 id={"userRow."+user.userid} 
-                onMouseOut={()=>opacityDown("userRow"+user.userid,2)} 
-                onMouseOver={()=>opacityDown("userRow"+user.userid,1)}
-                onClick={()=>navigate('chat//profile/'+user.userid)}>
+                onMouseOut={()=>opacityDown("userRow."+user.userid,2)} 
+                onMouseOver={()=>opacityDown("userRow."+user.userid,1)}
+                >
                 <UserPhoto userData={user}/>
                 <div style={{display:"block",margin:"8px 0px"}} key={"div.data."+user.userid}>
                     <div 
@@ -41,6 +41,9 @@ const UserTile = ({user,isConfirmed}) =>{
                     </div>
                 </div>
                 <Actions user={user} key={"div.actions."+user.userid}/>
+                <Button as={NavLink} to={"/chat/profile/"+user.userid} style={{margin:" 15px 20px"}}>
+                    Profil
+                </Button>
             </Card>:null}</>
                     
     )

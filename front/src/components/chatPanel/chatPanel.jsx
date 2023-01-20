@@ -6,7 +6,6 @@ import MessagesPanel from './messagesPanel';
 import WrittingPanel from './writtingPanel';
 import styles from './styles';
 
-import fetchUserData from '../services/functions/fetchUserData';
 import fetchMessages from '../services/functions/fetchMessages';
 const ChatPanel = ({listOfMessages}) =>{
   
@@ -18,17 +17,41 @@ const ChatPanel = ({listOfMessages}) =>{
     const conversationId = params.conversationid;
 
     const [recipients,setRecipients] = useState();
+    const [conversationData,setConversationData] = useState();
     const [messages,setMessages] = useState([]);
     const navigate = useNavigate();
 
+    async function fetchCorespondentData() {
+      const userId = localStorage.getItem("userId");
+      
+        await instance.get('conversation/'+conversationId, { withCredentials: true,sameSite:false})
+        .then(response=>{
+          setConversationData(response.data);
+          console.log(response.data)
+          let array = [];
+          response.data.participants.forEach((object)=>{
+            if(object.userid!==userId) {
+                array.push(object);
+            } 
+          });
+          setRecipients(array);
+          return array;
+        })
+        .catch(response=>{
+          if(response.status===403) return response.status;
+          else return 0;});
+        
+      };
+
     useEffect(()=>{
-      const result = fetchUserData(instance,conversationId);
-      setRecipients(result);
+      fetchCorespondentData(instance,conversationId);
+      
       if(listOfMessages.current[conversationId]){ 
         setMessages(listOfMessages.current[conversationId]);
       }
       else {
         let result = fetchMessages(instance,conversationId,listOfMessages)
+        console.log(result)
         if(result!==403) setMessages(result);
         else navigate('/login');
       }
@@ -71,8 +94,8 @@ const ChatPanel = ({listOfMessages}) =>{
         <>
         <ChatCard className="bg-chat text-white">
             <CardHeader>
-              {recipients?.length<2 &&
-              recipients[0].firstname + " - "+recipients[0].lastname}
+              {recipients?.length<2 && conversationData&&conversationData.conversationType===0&&recipients[0].firstname + " - "+recipients[0].lastname}
+              {conversationData&&conversationData.conversationType===1&&conversationData.name}
               <LogoutButton variant="danger" onClick={()=>logout(navigate)}>
                 <LogoutIcon/>
               </LogoutButton>

@@ -13,13 +13,15 @@ const RegisterPage = () =>{
     const [statusCode,setStatusCode] = useState();
     const onSubmit = data => {
         instance.post('/user/registration', {
+            firstname:data.firstname,
+            lastname:data.lastname,
             name:data.name,
             sex:data.gender,
             email:data.email,
             pwd:data.pwd
           }, { withCredentials: true })
           .then(function (response) {
-                setStatusCode(201);
+                setStatusCode(response.status);
           })
           .catch(({response})=>{
                 setStatusCode(response.status);
@@ -37,9 +39,21 @@ const RegisterPage = () =>{
                     <Form.Group  className="mb-3" controlId="formBasicData">
                         <Form.Control 
                             type="text" 
-                            name="username"
-                            placeholder="Imię i Nazwisko" 
-                            {...register("username", { required: true })}
+                            name="firstname"
+                            placeholder="Imię" 
+                            {...register("firstname", { required: true })}
+                        />
+                        {
+                            errors.username && 
+                            <Form.Label style={{color:"firebrick"}}>Wpisz imię i nazwisko!</Form.Label>
+                        }
+                    </Form.Group>
+                    <Form.Group  className="mb-3" controlId="formBasicData">
+                        <Form.Control 
+                            type="text" 
+                            name="lastname"
+                            placeholder="Nazwisko" 
+                            {...register("lastname", { required: true })}
                         />
                         {
                             errors.username && 

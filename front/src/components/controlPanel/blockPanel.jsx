@@ -13,6 +13,7 @@ import OverlayTrigger from 'react-bootstrap/OverlayTrigger';
 import Tooltip from 'react-bootstrap/Tooltip';
 import InstanceContext from "../context/instance/InstanceContext";
 import {FaUserFriends,FaUserAlt,FaUserEdit} from 'react-icons/fa';
+import GroupConversationProfile from "./grupConversationProfile";
 
 const BlockPanel = ({conversations}) =>{
     const instance = useContext(InstanceContext);
@@ -30,7 +31,7 @@ const BlockPanel = ({conversations}) =>{
     },[])
     return(
         <>
-        <Card className="bg-dark text-white" style={{width:'auto',maxHeight:"100vh"}}>
+        <Card className="bg-dark text-white" style={{minWidth:"250px",width:'auto',maxHeight:"100vh"}}>
             <Card.Header style={{display:"flex"}}>
                 {userData &&<UserPhoto userData={userData}/>}
                 {userData&& 
@@ -50,8 +51,6 @@ const BlockPanel = ({conversations}) =>{
                     </OverlayTrigger>
                     <OverlayTrigger overlay={<Tooltip id="tooltip-disabled">Zarządzanie</Tooltip>}>
                         <Navbar variant="dark" bg="dark" expand="sm" style={{top:"-7px"}}>
-                            <Navbar.Toggle aria-controls="navbar-dark-example" />
-                            <Navbar.Collapse id="navbar-dark-example">
                                 <Nav>
                                     <NavDropdown
                                     id="nav-dropdown-dark-example"
@@ -66,17 +65,20 @@ const BlockPanel = ({conversations}) =>{
                                     </NavDropdown.Item>
                                     </NavDropdown>
                                 </Nav>
-                            </Navbar.Collapse>
                         </Navbar>
                     </OverlayTrigger>
                 </div>
                 <ListGroup variant="flush">
                     {conversations.map(conversation=>{
                         return(
+                            <>
+                            {conversation.conversationType===currentConversationsType?
                             <ListGroup.Item className="bg-transparent text-white" key={conversation.conversationId}>
-                                {conversation.conversationType===currentConversationsType?
-                                <Profile conversation={conversation}/>:null}
-                            </ListGroup.Item>
+                                {conversation.conversationType===0?
+                                <Profile conversation={conversation}/>:
+                                <GroupConversationProfile conversation={conversation}/>}
+                                
+                            </ListGroup.Item>:null}</>
                         )
                     })}
                     

@@ -7,7 +7,7 @@ import FriendsManagement from './configurationPages/friendsManagement';
 import GroupsManagement from './configurationPages/groupManagement';
 import SocketContext from './context/socket/SocketContext';
 import InstanceContext from './context/instance/InstanceContext';
-import UserProfile from './configurationPages/friends/userProfile';
+import ProfilePage from './blockComponents/profilePage';
 
 const ChatContainer = () =>{ 
   const socket = io("http://localhost:5000", {
@@ -75,11 +75,10 @@ const ChatContainer = () =>{
               <Route 
                 path="/profile/:userid" 
                 element={
-                  <UserProfile/>
+                  <ProfilePage/>
                 }
               />
             </Routes>
-          
           </>
     )
 }

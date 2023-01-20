@@ -92,6 +92,19 @@ export class FriendController {
         return this.friendService.getFriendList(userid);
     }
 
+    //Get a list of common friends
+    @UseGuards(AuthenticatedGuard,UserIdentityGuard)
+    @Get('commonlist')
+    @ApiOperation({ summary: 'Get a list of common friends' })
+    @ApiResponse({ status: 200, description: 'Friends found.'})
+    @ApiResponse({ status: 404, description: "User Account doesn't exists"})
+    getCommonFriendList(
+        @Query("userid") userid: string,
+        @Query("friendid") friendid: string,
+    ):Promise<HttpException|userData[]>{
+        return this.friendService.getCommonFriendList(userid,friendid);
+    }
+
     //Delete user from friend list
     @UseGuards(AuthenticatedGuard,UserIdentityGuard)
     @Delete()

@@ -149,6 +149,19 @@ export class FriendService {
         return flist;
     }
 
+    async getCommonFriendList(userid: string, friendid:string): Promise<userData[]> {
+        const user = await User.findOne({userid});
+        if(!user)
+            throw new HttpException("User doesn't exist",HttpStatus.NOT_FOUND);
+        
+        const list = await User.query(
+        `select user.userid,user.firstname,user.lastname,user.name,user.sex,user.email from user,friend where (user.userid = friend.userUserid or user.userid = friend.friendUserid) and friend.confirmatonStatus=2 and userid <> "${userid}"  intersect `+
+        `select user.userid,user.firstname,user.lastname,user.name,user.sex,user.email from user,friend where (user.userid = friend.userUserid or user.userid = friend.friendUserid) and friend.confirmatonStatus=2 and userid <> "${friendid}"`);
+        //"where userquery.userid = friendquery.userid");
+        console.log(list)
+        return list;
+    }
+
     async deleteFriend(userid:string,friendid:string):Promise<HttpException> {
         const user = await User.findOne({userid});
         if(!user)

@@ -14,15 +14,18 @@ const ActualFriends = () =>{
         .then(res=>setFriendList(res.data))
         .catch(err=>console.log(err));
     }
+
     useEffect(()=>{
         getFriends();
     },[])
+    
     return(
         <div>
             {friendList&&friendList.map(user=>{
                 return(
                     <div>
-                        <UserTile user={user}/>
+                        <UserTile 
+                        user={user}/>
                     </div>
                 )
             })}

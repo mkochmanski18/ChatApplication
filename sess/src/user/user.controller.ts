@@ -80,6 +80,7 @@ export class UserController {
     @Get('/reset/:email')
     @ApiOperation({ summary: 'Request of reset User password' })
     @ApiResponse({ status: 200, description: 'Request sended'})
+    @ApiResponse({ status: 404, description: 'User does not exist'})
     @ApiResponse({ status: 500, description: 'Internal server error'})
     resetPasswordRequest(
         @Param('email') email:string,

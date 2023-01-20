@@ -26,10 +26,10 @@ export class UserService {
   }
 
   transporter = nodemailer.createTransport({
-    host: "smtp-mail.outlook.com",
+    host: "outlook.office365.com",
     port: 587,
     auth: {
-      user: 'chatapp18@outlook.com',
+      user: 'mkoch18@outlook.com',
       pass: 'Fp#VHNetLb9Za'
     }
 });
@@ -80,16 +80,16 @@ createToken(tokenId:string, user: userData, type:TokenTypeEnum): string {
                 //sending mail with confirmation
                 let message:string = "Hello "+user.name+" "+user.firstname+"!\n This email has been generated automaticaly. Don't answer this message.\n"+
                 "It contains account confirmation link. If you got this mail by accident, just ignore this mail.\n "+
-                "If you're expecting this email, just click in link below.\n"+address+":"+port+"/user/confirmation/"+user.userid;
+                "If you're expecting this email, just click in link below.\n"+address+":"+5000+"/user/confirmation/"+user.userid;
                 let htmlmessage = 
                 "<div style='text-align:center'><h5>Hello "+user.firstname+"!</h5><p>This email has been generated automaticaly. Don't answer this message.</p>"+
                 "<p>It contains account confirmation link. If you got this mail by accident, just ignore this mail.</p>"+
                 "<p>If you're expecting this email, just click in link below.</p>"+
-                "<p>"+address+":"+port+"/user/confirmation/"+user.userid+"</p></div>";
+                "<p>"+address+":"+5000+"/user/confirmation/"+user.userid+"</p></div>";
 
                 console.log(message)
                 let info = await this.transporter.sendMail({
-                  from: '"ChatApplication" <mail@chatapp.com>', // sender address
+                  from: '"ChatApplication" <mkoch18@outlook.com>', // sender address
                   to: user.email, // list of receivers
                   subject: "Confirm email account!", // Subject line
                   text: message, // plain text body
@@ -170,7 +170,7 @@ createToken(tokenId:string, user: userData, type:TokenTypeEnum): string {
         "<p>"+address+":"+port+"/user/reset/"+token+"</p></div>";
         console.log(message)
         let info = await this.transporter.sendMail({
-          from: '"ChatApp" <mail@chatapp.com>', // sender address
+          from: '"ChatApp" <mkoch18@outlook.com>', // sender address
           to: user.email, // list of receivers
           subject: "Reset Account password!", // Subject line
           text: message, // plain text body
@@ -182,9 +182,11 @@ createToken(tokenId:string, user: userData, type:TokenTypeEnum): string {
     }
 
       async resetPassword(password:string, token:string): Promise<HttpException> {
-        const payload = this.validateToken(token);
+        var payload;
+        try {payload = this.validateToken(token);}
+        catch{throw new HttpException("Link is incorrect!", HttpStatus.FORBIDDEN);}
         //console.log(payload)
-
+        console.log(token)
         const checktoken = await Token.findOne({resetTokenId:payload.tokenId})
         if(!checktoken) throw new HttpException("Link is incorrect!", HttpStatus.FORBIDDEN)
 

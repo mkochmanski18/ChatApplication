@@ -16,7 +16,7 @@ const Profile = ({conversation}) =>{
         const array = takeParticipants(conversation,instance,setIsFriend);
         setFriends(array);
     },[conversation,instance])
-    
+    console.log(conversation)
     return(
         <>
         {isFriend&&isFriend===2?
@@ -25,6 +25,7 @@ const Profile = ({conversation}) =>{
             {friends.length>0 && <Information users={friends}/>}
         </ProfileContainer>:null
         }
+       
         </>
     )
 }

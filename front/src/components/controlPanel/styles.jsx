@@ -25,7 +25,7 @@ const panelStyles ={
         margin: 0.1em 0.5em;
     `,
     InformationBlock: styled.div`
-        height:50px;
+        height:80px;
         position: relative;               
         top: 50%;                      
         font-size: 15px;
